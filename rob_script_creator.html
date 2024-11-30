@@ -1,0 +1,160 @@
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RobScript Creator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+    <header class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">RobScript Creator</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="#" class="hover:underline">الرئيسية</a></li>
+                    <li><a href="#" class="hover:underline">الميزات</a></li>
+                    <li><a href="#" class="hover:underline">التسعير</a></li>
+                    <li><a href="#" class="hover:underline">تواصل معنا</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4">
+        <section class="mb-8">
+            <h2 class="text-3xl font-bold mb-4">وصف تطبيق "RobScript Creator" لتوليد برمجة الروبوتات</h2>
+            <p class="mb-4">RobScript Creator هو تطبيق مبتكر تم تصميمه لتقديم الحل الأمثل للمهندسين والمطورين في مجال الروبوتات، حيث يتيح لهم توليد أسكربتات برمجة متقدمة للروبوتات من خلال إدخال أوصاف طبيعية. يقدم التطبيق إمكانيات واسعة تتجاوز مجرد توليد الأكواد، ليدمج بين تقنيات الذكاء الاصطناعي، تحليل اللغة الطبيعية، التصميم الثلاثي الأبعاد، وحسابات التكلفة المادية لبناء الروبوتات.</p>
+        </section>
+
+        <section class="mb-8">
+            <h3 class="text-2xl font-bold mb-4">الدردشة مع RobScript Creator</h3>
+            <div class="bg-white rounded-lg shadow-lg p-4">
+                <div class="flex flex-col space-y-4 h-96 overflow-y-auto" id="chat-box"></div>
+                <div class="mt-4 flex">
+                    <input type="text" id="user-input" class="flex-grow p-2 border rounded-l-lg" placeholder="اكتب رسالتك هنا...">
+                    <button class="bg-blue-600 text-white p-2 rounded-r-lg" onclick="sendMessage()">إرسال</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h3 class="text-2xl font-bold mb-4">تصور ثلاثي الأبعاد للروبوت</h3>
+            <div id="3d-viewer" class="bg-white rounded-lg shadow-lg p-4 h-96"></div>
+        </section>
+    </main>
+
+    <footer class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2023 RobScript Creator. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        const openaiApiKey = 'Ysk-proj-YfgN9Vi3qKhJAIUeNi6zZNKBgfyldLuyeVJHep5g5fOjajdpCJq6FBjP8TZ4b8jhGiii56tWFLT3BlbkFJX1-6EIs0mJkJdKBvYrM6z9mo2HTOvwXsHTH30JuexOIBQnAhmiBUHIK7ceWnhCatjLD19gyE4A'; // قم بإدخال مفتاح API الخاص بك هنا
+
+        async function sendMessage() {
+            const userInput = document.getElementById('user-input').value.trim();
+            const chatBox = document.getElementById('chat-box');
+
+            if (userInput !== '') {
+                // عرض رسالة المستخدم في واجهة الدردشة
+                const userMessage = document.createElement('div');
+                userMessage.classList.add('flex', 'justify-end');
+                userMessage.innerHTML = `<div class="bg-blue-600 text-white p-2 rounded-lg max-w-xs"><p>${userInput}</p></div>`;
+                chatBox.appendChild(userMessage);
+
+                // عرض رسالة أن التطبيق يعالج الطلب
+                const processingMessage = document.createElement('div');
+                processingMessage.classList.add('flex', 'justify-start');
+                processingMessage.innerHTML = `<div class="bg-gray-200 p-2 rounded-lg max-w-xs"><p>جارٍ توليد الأسكربت والمواد...</p></div>`;
+                chatBox.appendChild(processingMessage);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+                // استدعاء الدوال لتوليد الأسكربت والمواد والصور
+                const script = await generateScript(userInput);
+                const materials = await generateMaterialsList(userInput);
+                const images = await generateProposedImages(userInput);
+
+                // عرض الأسكربت
+                const scriptMessage = document.createElement('div');
+                scriptMessage.classList.add('flex', 'justify-start');
+                scriptMessage.innerHTML = `<div class="bg-gray-200 p-2 rounded-lg max-w-xs"><p>تم توليد الأسكربت:</p><pre class="bg-gray-100 p-2 rounded-lg mt-2">${script}</pre></div>`;
+                chatBox.appendChild(scriptMessage);
+
+                // عرض قائمة المواد
+                const materialsMessage = document.createElement('div');
+                materialsMessage.classList.add('flex', 'justify-start');
+                materialsMessage.innerHTML = `<div class="bg-gray-200 p-2 rounded-lg max-w-xs"><p>قائمة المواد المطلوبة:</p><ul class="list-disc list-inside">${materials.map(item => `<li>${item}</li>`).join('')}</ul></div>`;
+                chatBox.appendChild(materialsMessage);
+
+                // عرض الصور المقترحة
+                const imagesMessage = document.createElement('div');
+                imagesMessage.classList.add('flex', 'justify-start');
+                imagesMessage.innerHTML = `<div class="bg-gray-200 p-2 rounded-lg max-w-xs"><p>صور مقترحة لشكل الروبوت:</p><div class="grid grid-cols-2 gap-2">${images.map(url => `<img src="${url}" class="w-32 h-32 object-cover mt-2">`).join('')}</div></div>`;
+                chatBox.appendChild(imagesMessage);
+
+                chatBox.scrollTop = chatBox.scrollHeight;
+                document.getElementById('user-input').value = ''; // مسح الحقل بعد الإرسال
+            }
+        }
+
+        async function generateScript(description) {
+            const response = await fetch('https://api.openai.com/v1/engines/davinci-codex/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openaiApiKey}`
+                },
+                body: JSON.stringify({
+                    prompt: `Generate a script for a robot based on the following description: ${description}`,
+                    max_tokens: 150
+                })
+            });
+            const data = await response.json();
+            return data.choices[0].text.trim();
+        }
+
+        async function generateMaterialsList(description) {
+            const response = await fetch('https://api.openai.com/v1/engines/davinci-codex/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openaiApiKey}`
+                },
+                body: JSON.stringify({
+                    prompt: `Generate a list of materials for a robot based on the following description: ${description}`,
+                    max_tokens: 100
+                })
+            });
+            const data = await response.json();
+            return data.choices[0].text.trim().split('\n').filter(item => item);
+        }
+
+        async function generateProposedImages(description) {
+            const response = await fetch('https://api.openai.com/v1/images/generations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${openaiApiKey}`
+                },
+                body: JSON.stringify({
+                    prompt: description,
+                    n: 1,
+                    size: "256x256"
+                })
+            });
+            const data = await response.json();
+            return data.data.map(image => image.url);
+        }
+    </script>
+</body>
+</html>
